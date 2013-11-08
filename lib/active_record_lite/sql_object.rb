@@ -19,10 +19,10 @@ class SQLObject < MassObject
   # for each row in the result. (might want to call #to_sym on keys)
   def self.all
     rows = DBConnection.execute(<<-SQL)
-    SELECT
-      *
-    FROM
-      #{@table_name}
+      SELECT
+        *
+      FROM
+        #{@table_name}
     SQL
 
     parse_all(rows)
@@ -31,13 +31,28 @@ class SQLObject < MassObject
   # querys database for record of this type with id passed.
   # returns either a single object or nil.
   def self.find(id)
+    item = DBConnection.execute(<<-SQL)
+    SELECT
+      *
+    FROM
+      #{@table_name}
+    WHERE
+      id = #{id}
+    SQL
 
+    parse_all(item).first
   end
 
   # executes query that creates record in db with objects attribute values.
   # use send and map to get instance values.
   # after, update the id attribute with the helper method from db_connection
   def create
+    #send each attribute to get values
+    #insert into table name
+    DBConnection.execute(<<-SQL)
+    INSERT INTO
+    #{@table_name}
+    SQL
   end
 
   # executes query that updates the row in the db corresponding to this instance
@@ -51,5 +66,8 @@ class SQLObject < MassObject
 
   # helper method to return values of the attributes.
   def attribute_values
+    attributes.map do |attr|
+      send(attr)
+    end
   end
 end
