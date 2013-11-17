@@ -35,7 +35,7 @@ class SQLObject < MassObject
     SELECT
       *
     FROM
-      #{@table_name}
+      #{table_name}
     WHERE
       id = #{id}
     SQL
@@ -48,26 +48,45 @@ class SQLObject < MassObject
   # after, update the id attribute with the helper method from db_connection
   def create
     #send each attribute to get values
+    attr_string = self.class.attributes.join(", ")
+    quest_string = (['?'] * self.class.attributes.count).join(", ")
     #insert into table name
-    DBConnection.execute(<<-SQL)
+    DBConnection.execute(<<-SQL, *attribute_values)
     INSERT INTO
-    #{@table_name}
+    #{self.class.table_name}
+    (#{attr_string})
+    VALUES
+    (#{quest_string})
     SQL
+
+    self.id = DBConnection.last_insert_row_id
+
+    nil
   end
 
   # executes query that updates the row in the db corresponding to this instance
   # of the class. use "#{attr_name} = ?" and join with ', ' for set string.
   def update
+    set_string = (self.class.attributes.map { |attr| "#{attr} = ?" }).join(", ")
+    DBConnection.execute(<<-SQL, *attribute_values)
+    UPDATE
+    #{self.class.table_name}
+    SET
+    #{set_string}
+    WHERE
+    id = #{self.id}
+    SQL
   end
 
   # call either create or update depending if id is nil.
   def save
+    self.id.nil? ? create : update
   end
 
   # helper method to return values of the attributes.
   def attribute_values
-    attributes.map do |attr|
-      send(attr)
+    self.class.attributes.map do |attr|
+      self.send(attr)
     end
   end
 end
