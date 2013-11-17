@@ -6,5 +6,21 @@ module Searchable
   # Hash#values will be helpful here.
   # returns an array of objects
   def where(params)
+    #SELECT *
+    #FROM table_name
+    #WHERE #{key} = ? join " AND "
+    #MassObject.parse_all(results)
+    vals = params.values
+    set_string = params.map { |k, v| "#{k} = ?" }.join(" AND ")
+    results = DBConnection.execute(<<-SQL, *vals)
+    SELECT
+      *
+    FROM
+      "#{table_name}"
+    WHERE
+      "#{set_string}"
+    SQL
+
+    parse_all(results)
   end
 end
