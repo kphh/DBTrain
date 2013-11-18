@@ -100,7 +100,8 @@ module Associatable
         JOIN
           #{aps2.other_table}
         ON
-          #{aps1.other_table}.#{aps2.foreign_key} = #{aps2.other_table}.#{aps2.primary_key}
+          #{aps1.other_table}.#{aps2.foreign_key} =
+          #{aps2.other_table}.#{aps2.primary_key}
         WHERE
           #{aps1.other_table}.#{aps1.primary_key} = ?
       SQL
