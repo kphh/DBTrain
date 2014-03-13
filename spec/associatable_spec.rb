@@ -2,7 +2,6 @@ require 'active_record_lite'
 
 describe "associatable" do
   before(:all) do
-    # https://tomafro.net/2010/01/tip-relative-paths-with-file-expand-path
     cats_db_file_name =
       File.expand_path(File.join(File.dirname(__FILE__), "cats.db"))
     DBConnection.open(cats_db_file_name)
